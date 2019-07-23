@@ -4,177 +4,88 @@ package apdu
 
 //go:generate go run github.com/zemnmez/cardauth/apdu/gen/instrs $GOFILE
 //go:generate gofmt -w -s $GOFILE
-
-import "fmt"
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Instruction
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Instruction -output=instruction_infostring.go -linecomment
+//go:generate go run github.com/zemnmez/cardauth/apdu/gen/repl -from=_Instruction -to=_Info_Instruction -file=instruction_infostring.go
+//go:generate gofmt -w -r String->Info ./instruction_infostring.go
 
 // Instruction represents a smart card instruction as defined in ISO/IEC 7816-4:2005(E)
-type Instruction string
+type Instruction byte
 
 const (
-	// InstrDeactivateFile represents the "DEACTIVATE FILE" instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
-	InstrDeactivateFile Instruction = "\x04"
-
-	// InstrEraseRecord represents the "ERASE RECORD (S)" instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.8
-	InstrEraseRecord Instruction = "\x0C"
-
-	// InstrEraseBinary represents the "ERASE BINARY" instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.7
-	InstrEraseBinary Instruction = "\x0E\x0F"
-
-	// InstrPerformScqlOperation represents the "PERFORM SCQL OPERATION" instruction as defined in ISO/IEC 7816-4:2005(E) Part 7
-	InstrPerformScqlOperation Instruction = "\x10"
-
-	// InstrPerformTransactionOperation represents the "PERFORM TRANSACTION OPERATION" instruction as defined in ISO/IEC 7816-4:2005(E) Part 7
-	InstrPerformTransactionOperation Instruction = "\x12"
-
-	// InstrPerformUserOperation represents the "PERFORM USER OPERATION" instruction as defined in ISO/IEC 7816-4:2005(E) Part 7
-	InstrPerformUserOperation Instruction = "\x14"
-
-	// InstrVerify represents the "VERIFY" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.6
-	InstrVerify Instruction = "\x20\x21"
-
-	// InstrManageSecurityEnvironment represents the "MANAGE SECURITY ENVIRONMENT" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.11
-	InstrManageSecurityEnvironment Instruction = "\x22"
-
-	// InstrChangeReferenceData represents the "CHANGE REFERENCE DATA" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.7
-	InstrChangeReferenceData Instruction = "\x24"
-
-	// InstrDisableVerificationRequirement represents the "DISABLE VERIFICATION REQUIREMENT" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.9
-	InstrDisableVerificationRequirement Instruction = "\x26"
-
-	// InstrEnableVerificationRequirement represents the "ENABLE VERIFICATION REQUIREMENT" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.8
-	InstrEnableVerificationRequirement Instruction = "\x28"
-
-	// InstrPerformSecurityOperation represents the "PERFORM SECURITY OPERATION" instruction as defined in ISO/IEC 7816-4:2005(E) Part 8
-	InstrPerformSecurityOperation Instruction = "\x2A"
-
-	// InstrResetRetryCounter represents the "RESET RETRY COUNTER" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.10
-	InstrResetRetryCounter Instruction = "\x2C"
-
-	// InstrActivateFile represents the "ACTIVATE FILE" instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
-	InstrActivateFile Instruction = "\x44"
-
-	// InstrGenerateAsymmetricKeyPair represents the "GENERATE ASYMMETRIC KEY PAIR" instruction as defined in ISO/IEC 7816-4:2005(E) Part 8
-	InstrGenerateAsymmetricKeyPair Instruction = "\x46"
-
-	// InstrManageChannel represents the "MANAGE CHANNEL" instruction as defined in ISO/IEC 7816-4:2005(E) 7.1.2
-	InstrManageChannel Instruction = "\x70"
-
-	// InstrExternalAuthenticate represents the "EXTERNAL (/ MUTUAL) AUTHENTICATE" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.4
-	InstrExternalAuthenticate Instruction = "\x82"
-
-	// InstrGetChallenge represents the "GET CHALLENGE" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.3
-	InstrGetChallenge Instruction = "\x84"
-
-	// InstrGeneralAuthenticate represents the "GENERAL AUTHENTICATE" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.5
-	InstrGeneralAuthenticate Instruction = "\x86\x87"
-
-	// InstrInternalAuthenticate represents the "INTERNAL AUTHENTICATE" instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.2
-	InstrInternalAuthenticate Instruction = "\x88"
-
-	// InstrSearchBinary represents the "SEARCH BINARY" instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.6
-	InstrSearchBinary Instruction = "\xA0\xA1"
-
-	// InstrSearchRecord represents the "SEARCH RECORD" instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.7
-	InstrSearchRecord Instruction = "\xA2"
-
-	// InstrSelect represents the "SELECT" instruction as defined in ISO/IEC 7816-4:2005(E) 7.1.1
-	InstrSelect Instruction = "\xA4"
-
-	// InstrReadBinary represents the "READ BINARY" instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.3
-	InstrReadBinary Instruction = "\xB0\xB1"
-
-	// InstrReadRecord represents the "READ RECORD" instruction as defined in ISO/IEC 7816-4:2005(E) (S) 7.3.3
-	InstrReadRecord Instruction = "\xB2\xB3"
-
-	// InstrGetResponse represents the "GET RESPONSE" instruction as defined in ISO/IEC 7816-4:2005(E) 7.6.1
-	InstrGetResponse Instruction = "\xC0"
-
-	// InstrEnvelope represents the "ENVELOPE" instruction as defined in ISO/IEC 7816-4:2005(E) 7.6.2
-	InstrEnvelope Instruction = "\xC2\xC3"
-
-	// InstrGetData represents the "GET DATA" instruction as defined in ISO/IEC 7816-4:2005(E) 7.4.2
-	InstrGetData Instruction = "\xCA\xCB"
-
-	// InstrWriteBinary represents the "WRITE BINARY" instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.6
-	InstrWriteBinary Instruction = "\xD0\xD1"
-
-	// InstrWriteRecord represents the "WRITE RECORD" instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.4
-	InstrWriteRecord Instruction = "\xD2"
-
-	// InstrUpdateBinary represents the "UPDATE BINARY" instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.5
-	InstrUpdateBinary Instruction = "\xD6\xD7"
-
-	// InstrPutData represents the "PUT DATA" instruction as defined in ISO/IEC 7816-4:2005(E) 7.4.3
-	InstrPutData Instruction = "\xDA\xDB"
-
-	// InstrUpdateRecord represents the "UPDATE RECORD" instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.5
-	InstrUpdateRecord Instruction = "\xDC\xDD"
-
-	// InstrCreateFile represents the "CREATE FILE" instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
-	InstrCreateFile Instruction = "\xE0"
-
-	// InstrAppendRecord represents the "APPEND RECORD" instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.6
-	InstrAppendRecord Instruction = "\xE2"
-
-	// InstrDeleteFile represents the "DELETE FILE" instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
-	InstrDeleteFile Instruction = "\xE4"
-
-	// InstrTerminateDf represents the "TERMINATE DF" instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
-	InstrTerminateDf Instruction = "\xE6"
-
-	// InstrTerminateEf represents the "TERMINATE EF" instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
-	InstrTerminateEf Instruction = "\xE8"
-
-	// InstrTerminateCardUsage represents the "TERMINATE CARD USAGE" instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
-	InstrTerminateCardUsage Instruction = "\xFE"
+	InstrDeactivateFile                 Instruction = 0x04 // 'DEACTIVATE FILE' instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
+	InstrEraseRecord                    Instruction = 0x0C // 'ERASE RECORD (S)' instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.8
+	InstrEraseBinary                    Instruction = 0x0E // 'ERASE BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.7
+	InstrEraseBinaryAlt                 Instruction = 0x0F // 'ERASE BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.7
+	InstrPerformScqlOperation           Instruction = 0x10 // 'PERFORM SCQL OPERATION' instruction as defined in ISO/IEC 7816-4:2005(E) Part 7
+	InstrPerformTransactionOperation    Instruction = 0x12 // 'PERFORM TRANSACTION OPERATION' instruction as defined in ISO/IEC 7816-4:2005(E) Part 7
+	InstrPerformUserOperation           Instruction = 0x14 // 'PERFORM USER OPERATION' instruction as defined in ISO/IEC 7816-4:2005(E) Part 7
+	InstrVerify                         Instruction = 0x20 // 'VERIFY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.6
+	InstrVerifyAlt                      Instruction = 0x21 // 'VERIFY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.6
+	InstrManageSecurityEnvironment      Instruction = 0x22 // 'MANAGE SECURITY ENVIRONMENT' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.11
+	InstrChangeReferenceData            Instruction = 0x24 // 'CHANGE REFERENCE DATA' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.7
+	InstrDisableVerificationRequirement Instruction = 0x26 // 'DISABLE VERIFICATION REQUIREMENT' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.9
+	InstrEnableVerificationRequirement  Instruction = 0x28 // 'ENABLE VERIFICATION REQUIREMENT' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.8
+	InstrPerformSecurityOperation       Instruction = 0x2A // 'PERFORM SECURITY OPERATION' instruction as defined in ISO/IEC 7816-4:2005(E) Part 8
+	InstrResetRetryCounter              Instruction = 0x2C // 'RESET RETRY COUNTER' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.10
+	InstrActivateFile                   Instruction = 0x44 // 'ACTIVATE FILE' instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
+	InstrGenerateAsymmetricKeyPair      Instruction = 0x46 // 'GENERATE ASYMMETRIC KEY PAIR' instruction as defined in ISO/IEC 7816-4:2005(E) Part 8
+	InstrManageChannel                  Instruction = 0x70 // 'MANAGE CHANNEL' instruction as defined in ISO/IEC 7816-4:2005(E) 7.1.2
+	InstrExternalAuthenticate           Instruction = 0x82 // 'EXTERNAL (/ MUTUAL) AUTHENTICATE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.4
+	InstrGetChallenge                   Instruction = 0x84 // 'GET CHALLENGE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.3
+	InstrGeneralAuthenticate            Instruction = 0x86 // 'GENERAL AUTHENTICATE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.5
+	InstrGeneralAuthenticateAlt         Instruction = 0x87 // 'GENERAL AUTHENTICATE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.5
+	InstrInternalAuthenticate           Instruction = 0x88 // 'INTERNAL AUTHENTICATE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.5.2
+	InstrSearchBinary                   Instruction = 0xA0 // 'SEARCH BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.6
+	InstrSearchBinaryAlt                Instruction = 0xA1 // 'SEARCH BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.6
+	InstrSearchRecord                   Instruction = 0xA2 // 'SEARCH RECORD' instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.7
+	InstrSelect                         Instruction = 0xA4 // 'SELECT' instruction as defined in ISO/IEC 7816-4:2005(E) 7.1.1
+	InstrReadBinary                     Instruction = 0xB0 // 'READ BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.3
+	InstrReadBinaryAlt                  Instruction = 0xB1 // 'READ BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.3
+	InstrReadRecord                     Instruction = 0xB2 // 'READ RECORD' instruction as defined in ISO/IEC 7816-4:2005(E) (S) 7.3.3
+	InstrReadRecordAlt                  Instruction = 0xB3 // 'READ RECORD' instruction as defined in ISO/IEC 7816-4:2005(E) (S) 7.3.3
+	InstrGetResponse                    Instruction = 0xC0 // 'GET RESPONSE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.6.1
+	InstrEnvelope                       Instruction = 0xC2 // 'ENVELOPE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.6.2
+	InstrEnvelopeAlt                    Instruction = 0xC3 // 'ENVELOPE' instruction as defined in ISO/IEC 7816-4:2005(E) 7.6.2
+	InstrGetData                        Instruction = 0xCA // 'GET DATA' instruction as defined in ISO/IEC 7816-4:2005(E) 7.4.2
+	InstrGetDataAlt                     Instruction = 0xCB // 'GET DATA' instruction as defined in ISO/IEC 7816-4:2005(E) 7.4.2
+	InstrWriteBinary                    Instruction = 0xD0 // 'WRITE BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.6
+	InstrWriteBinaryAlt                 Instruction = 0xD1 // 'WRITE BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.6
+	InstrWriteRecord                    Instruction = 0xD2 // 'WRITE RECORD' instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.4
+	InstrUpdateBinary                   Instruction = 0xD6 // 'UPDATE BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.5
+	InstrUpdateBinaryAlt                Instruction = 0xD7 // 'UPDATE BINARY' instruction as defined in ISO/IEC 7816-4:2005(E) 7.2.5
+	InstrPutData                        Instruction = 0xDA // 'PUT DATA' instruction as defined in ISO/IEC 7816-4:2005(E) 7.4.3
+	InstrPutDataAlt                     Instruction = 0xDB // 'PUT DATA' instruction as defined in ISO/IEC 7816-4:2005(E) 7.4.3
+	InstrUpdateRecord                   Instruction = 0xDC // 'UPDATE RECORD' instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.5
+	InstrUpdateRecordAlt                Instruction = 0xDD // 'UPDATE RECORD' instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.5
+	InstrCreateFile                     Instruction = 0xE0 // 'CREATE FILE' instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
+	InstrAppendRecord                   Instruction = 0xE2 // 'APPEND RECORD' instruction as defined in ISO/IEC 7816-4:2005(E) 7.3.6
+	InstrDeleteFile                     Instruction = 0xE4 // 'DELETE FILE' instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
+	InstrTerminateDf                    Instruction = 0xE6 // 'TERMINATE DF' instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
+	InstrTerminateEf                    Instruction = 0xE8 // 'TERMINATE EF' instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
+	InstrTerminateCardUsage             Instruction = 0xFE // 'TERMINATE CARD USAGE' instruction as defined in ISO/IEC 7816-4:2005(E) Part 9
 )
 
-var reverseInstruction = map[Instruction]string{
-	"\x04":     "InstrDeactivateFile",
-	"\x0C":     "InstrEraseRecord",
-	"\x0E\x0F": "InstrEraseBinary",
-	"\x10":     "InstrPerformScqlOperation",
-	"\x12":     "InstrPerformTransactionOperation",
-	"\x14":     "InstrPerformUserOperation",
-	"\x20\x21": "InstrVerify",
-	"\x22":     "InstrManageSecurityEnvironment",
-	"\x24":     "InstrChangeReferenceData",
-	"\x26":     "InstrDisableVerificationRequirement",
-	"\x28":     "InstrEnableVerificationRequirement",
-	"\x2A":     "InstrPerformSecurityOperation",
-	"\x2C":     "InstrResetRetryCounter",
-	"\x44":     "InstrActivateFile",
-	"\x46":     "InstrGenerateAsymmetricKeyPair",
-	"\x70":     "InstrManageChannel",
-	"\x82":     "InstrExternalAuthenticate",
-	"\x84":     "InstrGetChallenge",
-	"\x86\x87": "InstrGeneralAuthenticate",
-	"\x88":     "InstrInternalAuthenticate",
-	"\xA0\xA1": "InstrSearchBinary",
-	"\xA2":     "InstrSearchRecord",
-	"\xA4":     "InstrSelect",
-	"\xB0\xB1": "InstrReadBinary",
-	"\xB2\xB3": "InstrReadRecord",
-	"\xC0":     "InstrGetResponse",
-	"\xC2\xC3": "InstrEnvelope",
-	"\xCA\xCB": "InstrGetData",
-	"\xD0\xD1": "InstrWriteBinary",
-	"\xD2":     "InstrWriteRecord",
-	"\xD6\xD7": "InstrUpdateBinary",
-	"\xDA\xDB": "InstrPutData",
-	"\xDC\xDD": "InstrUpdateRecord",
-	"\xE0":     "InstrCreateFile",
-	"\xE2":     "InstrAppendRecord",
-	"\xE4":     "InstrDeleteFile",
-	"\xE6":     "InstrTerminateDf",
-	"\xE8":     "InstrTerminateEf",
-	"\xFE":     "InstrTerminateCardUsage",
+var resolveAlts = map[Instruction]Instruction{
+	InstrEraseBinaryAlt:         InstrEraseBinary,
+	InstrVerifyAlt:              InstrVerify,
+	InstrGeneralAuthenticateAlt: InstrGeneralAuthenticate,
+	InstrSearchBinaryAlt:        InstrSearchBinary,
+	InstrReadBinaryAlt:          InstrReadBinary,
+	InstrReadRecordAlt:          InstrReadRecord,
+	InstrEnvelopeAlt:            InstrEnvelope,
+	InstrGetDataAlt:             InstrGetData,
+	InstrWriteBinaryAlt:         InstrWriteBinary,
+	InstrUpdateBinaryAlt:        InstrUpdateBinary,
+	InstrPutDataAlt:             InstrPutData,
+	InstrUpdateRecordAlt:        InstrUpdateRecord,
 }
 
-func (i Instruction) String() string {
-	if v, ok := reverseInstruction[i]; ok {
+// Resolve resolves any possible alt Instruction to its primary Instruction.
+func (i Instruction) Resolve() Instruction {
+	if v, ok := resolveAlts[i]; ok {
 		return v
 	}
 
-	return fmt.Sprintf("unknown instruction %+q", string(i))
+	return i
 }

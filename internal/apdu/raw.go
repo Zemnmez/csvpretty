@@ -85,6 +85,12 @@ func (c Command) MarshalBinary() (b []byte, err error) {
 	return buf.Bytes(), nil
 }
 
+type Response struct {
+	Data []byte
+	SW1 byte
+	SW2 byte
+}
+
 // Raw represents the raw binary of an APDU structure
 type Raw struct {
 	Header
@@ -110,3 +116,4 @@ func (r Raw) MarshalBinary() (binary []byte, err error) {
 func (r Raw) Read(b []byte) (n int64, err error) {
 	panic("this value cannot be read. use WriteTo() instead")
 }
+

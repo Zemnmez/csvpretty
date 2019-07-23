@@ -102,19 +102,31 @@ func do() (err error) {
 		byteSequence, name, ref := fs[0], fs[1], fs[2]
 
 		ident := toCamelCase(bracketed.ReplaceAllString(name, ""))
-		comment := fmt.Sprintf("%s represents the %+q instruction as defined in ISO/IEC 7816-4:2005(E) %s", ident, name, ref)
+		comment := fmt.Sprintf("'%s' instruction as defined in ISO/IEC 7816-4:2005(E) %s", name, ref)
 
-		str := strings.Replace(byteSequence, "0x", "\\x", -1)
-		str = strings.Replace(str, ",", "", -1)
-		str = strings.Replace(str, " ", "", -1)
+		validBytes := strings.Split(byteSequence, ",")
 
-		instructions = append(instructions, fmt.Sprintf(
-			`// Instr%s
-Instr%s Instruction = "%s"
-`, comment, ident, str,
-		))
+		for i, byt := range validBytes {
+			byt = strings.TrimSpace(byt)
 
-		reverse = append(reverse, fmt.Sprintf(`"%s": "Instr%s",`, str, ident))
+			var altStr = ""
+			if i != 0 {
+				altStr = "Alt"
+			}
+
+			if i > 1 {
+				altStr = fmt.Sprintf("%s%d", altStr, i)
+			}
+
+			instructions = append(instructions, fmt.Sprintf(
+				`Instr%[2]s%[3]s Instruction = %[4]s // %[1]s`, comment, ident, altStr, byt,
+			))
+
+			if i != 0 {
+				reverse = append(reverse, fmt.Sprintf(`Instr%s%s: Instr%s,`, ident, altStr, ident))
+			}
+
+		}
 
 	}
 
@@ -125,26 +137,30 @@ Instr%s Instruction = "%s"
 
 `+`//go:generate go run github.com/zemnmez/cardauth/apdu/gen/instrs $GOFILE
 `+`//go:generate gofmt -w -s $GOFILE
-
-import "fmt"
+`+`//go:generate go run golang.org/x/tools/cmd/stringer -type=Instruction
+`+`//go:generate go run golang.org/x/tools/cmd/stringer -type=Instruction -output=instruction_infostring.go -linecomment
+`+`//go:generate go run github.com/zemnmez/cardauth/apdu/gen/repl -from=_Instruction -to=_Info_Instruction -file=instruction_infostring.go
+`+`//go:generate gofmt -w -r String->Info ./instruction_infostring.go
 
 // Instruction represents a smart card instruction as defined in ISO/IEC 7816-4:2005(E)
-type Instruction string
+type Instruction byte
 const (
 %s
 )
 
-var reverseInstruction = map[Instruction] string {
+var resolveAlts = map[Instruction] Instruction {
 %s
 }
 
-func(i Instruction) String() string {
-	if v, ok := reverseInstruction[i]; ok {
+// Resolve resolves any possible alt Instruction to its primary Instruction.
+func (i Instruction) Resolve() Instruction {
+	if v, ok := resolveAlts[i]; ok {
 		return v
 	}
 
-	return fmt.Sprintf("unknown instruction %%+q", string(i))
+	return i
 }
+
 `+"\n",
 		strings.Join(args, " "),
 		strings.Join(instructions, "\n"),
