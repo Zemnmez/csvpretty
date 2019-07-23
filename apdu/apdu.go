@@ -1,10 +1,7 @@
 package apdu
 
 import (
-	"bytes"
-	"encoding"
 	"encoding/binary"
-	"io"
 )
 
 var endianness = binary.BigEndian
