@@ -1,0 +1,43 @@
+CODE,             short,                            MEANING                                                                                
+0x6200,           unknown,                          No information given                                                                   
+0x6202..0x6280,   aborted please recover,           Aborted command; card expects recovery of query of XX in 0x62XX bytes                  
+0x6281,           corruption possible,              Part of returned data may be corrupted                                                 
+0x6282,           EOF,                              End of file or record reached before reading Nₑ bytes                                  
+0x6283,           deactivated,                      Selected file deactivated                                                              
+0x6284,           invalid file control,             File control information not formatted according to 5.3.3                              
+0x6285,           file terminated,                  Selected file in termination state                                                     
+0x6286,           no sensor input,                  No input data available from a sensor on the card                                      
+0x6300,           unknown,                          No information given                                                                   
+0x6381,           file full,                        File filled up by the last write                                                       
+0x63C0..0x63CF,   counter,                          Counter from 0 to 15 encoded by 'X' (exact meaning depending on the command)           
+0x6400,           unknown,                          No information given                                                                   
+0x6401,           immediate response required,      Immediate response required by the card                                                
+0x6402..0x6480,   aborted please recover,           Aborted command; card expects recovery of query of XX in 0x62XX bytes                  
+0x6500,           unknown,                          No information given                                                                   
+0x6581,           memory failure,                   Memory failure                                                                         
+0x6800,           unknown,                          No information given                                                                   
+0x6881',          unsupported channel,              Logical channel not supported                                                          
+0x6882,           secure unsupported,               Secure messaging not supported                                                         
+0x6883,           expected final command,           Last command of the chain expected                                                     
+0x6884,           chaining unsupported,             Command chaining not supported                                                         
+0x6900,           unknown,                          No information given                                                                   
+0x6981,           command incompatible with file,   Command incompatible with file structure                                               
+0x6982,           security unsatisfied,             Security status not satisfied                                                          
+0x6983,           auth method blocked,              Authentication method blocked                                                          
+0x6984,           reference unusuable,              Reference data not usable                                                              
+0x6985,           unsatisfied condition,            Conditions of use not satisfied                                                        
+0x6986,           command not allowed,              Command not allowed (no current EF)                                                    
+0x6987,           missing security object,          Expected secure messaging data objects missing                                         
+0x6988,           security object invalid,          Incorrect secure messaging data objects                                                
+0x6A00,           unknown,                          No information given                                                                   
+0x6A80,           incorrect parameters,             Incorrect parameters in the command data field                                         
+0x6A81,           unsupported function,             Function not supported                                                                 
+0x6A82,           file or app not found,            File or application not found                                                          
+0x6A83,           record not found,                 Record not found                                                                       
+0x6A84,           file too small,                   Not enough memory space in the file                                                    
+0x6A85,           nc TLV invalid,                   Nᶜ inconsistent with TLV structure                                                     
+0x6A86,           parameters incorrect,             Incorrect parameters P1-P2                                                             
+0x6A87,           invalid param Nc,                 Nᶜ inconsistent with parameters P1-P2                                                  
+0x6A88,           data or reference not found,      Referenced data or reference data not found (exact meaning depending on the command)   
+0x6A89,           file exists,                      File already exists                                                                    
+0x6A8A,           DF name exists,                   DF name already exists                                                                 

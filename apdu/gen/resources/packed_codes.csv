@@ -1,0 +1,4 @@
+RANGE,             FORMAT,   IDENT,                    MEANING                                                         
+0x6202..0x6280,    0x62XX,   RecoveryBytesRequested,   command was aborted; reqeusting recovery of query of XX bytes   
+0x63C0...0x63CF,   0x62CX,   Counter,                  command specific                                                
+0x6402..0x6480,    0x64XX,   RecoveryBytesRequested,   command was aborted; reqeusting recovery of query of XX bytes   
