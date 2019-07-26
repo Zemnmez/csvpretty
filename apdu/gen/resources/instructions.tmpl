@@ -1,0 +1,55 @@
+package {{.PackageName}}
+
+{{- with .short_response_codes -}}
+
+    {{- define "constRecord" -}}
+        {{- range $i, $bt := .Bytes | split ";" | fields}}
+            {{- .Name | makeIdentifier }}{{if $i > 0}}Alt{{if $i > 1}}{{$i}}{{end}}{{end}} Instruction = {{$bt}} // see ISO/IEC 7816-4:2005(E) {{.Reference -}}
+        {{- end -}}
+    {{- end -}}
+
+    // Instructions represents an APDU instruction
+    type Instruction uint16
+    const (
+        {{- range .Records}}
+            {{template "constRecord" .}}
+        {{end -}}
+    )
+
+    var reverseInstructions = map[Instruction]string {
+        {{range .Records}}
+            {{- range $i, $bt := .Bytes | split ";" | fields}}
+                {{- .Name | makeIdentifier }}{{if $i > 0}}Alt{{if $i > 1}}{{$i}}{{end}}{{end}}: "{{- .Name | makeIdentifier }}{{if $i > 0}}Alt{{if $i > 1}}{{$i}}{{end}}{{end}}",
+            {{- end -}}
+        {{end}}
+    }
+
+    var instructionInfo = map[Instruction] string {
+    {{range .Records}}
+            {{- range $i, $bt := .Bytes | split ";" | fields}}
+                "{{- .Name | makeIdentifier }}{{if $i > 0}}Alt{{if $i > 1}}{{$i}}{{end}}{{end}}": "{{.Reference}}",
+            {{- end -}}
+        {{end}}
+    }
+
+    // String() returns a short name for this Instruction
+    func (i Instruction) String() string {
+        if v, ok := reverseInstructions[i]; ok {
+            return v
+        }
+        
+        return fmt.Sprintf("Instruction(%+v)", i)
+    }
+
+    var ErrNoDescription = errors.New("no description for ADPU identifier")
+
+    //Info() returns a description of this Instruction. If no description is present, an error is returned.
+    func (i Instruction) Info() (info string, err error) {
+        if v, ok := instructionInfo[i]; ok {
+            return v, nil
+        }
+
+        return "", ErrNoDescription
+    }
+
+{{- end -}}

@@ -1,4 +1,4 @@
-CODE,   CATEGORY,             MEANING                                                                                 
+Code,   Category,             Meaning                                                                                
 0x61,   Normal Processing,    SW2 encodes the number of data bytes still available                                    
 0x62,   Warning Processing,   State of non-volatile memory is unchanged                                               
 0x63,   Warning Processing,   State of non-volatile memory has changed                                                

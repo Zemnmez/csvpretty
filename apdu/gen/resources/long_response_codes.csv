@@ -1,4 +1,4 @@
-CODE,             short,                            MEANING                                                                                
+Code,             Short,                            Meaning                                                                                
 0x6200,           unknown,                          No information given                                                                   
 0x6202..0x6280,   aborted please recover,           Aborted command; card expects recovery of query of XX in 0x62XX bytes                  
 0x6281,           corruption possible,              Part of returned data may be corrupted                                                 

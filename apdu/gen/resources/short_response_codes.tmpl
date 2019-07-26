@@ -1,0 +1,50 @@
+package {{.PackageName}}
+
+{{- with .short_response_codes -}}
+
+    {{- define "statusCodeRecord" -}}
+        {{.Category | makeIdentifier}} = {{.Code}} // {{.Meaning}}
+    {{- end - }}
+
+
+    // ResponseCategory represents an SW1 response byte that
+    // correspnds to a response type category
+    type ResponseCategory uint8
+    const (
+        {{- range .Records}}
+            {{template "statusCodeRecord" .}}
+        {{end -}}
+    )
+
+    var reverseResponseCategory = map[ResponseCategory] string {
+        {{range .Records}}
+            {{- .Name | makeIdentifier }}: "{{.Name | makeIdentifier}}",
+        {{end}}
+    }
+
+    var ResponseCategoryInfo = map[ResponseCategory] string {
+        {{range .Records}}
+                {{- .Name | makeIdentifier }}: "{{.Reference}}",
+        {{end}}
+    }
+
+    // String() returns a short name for this ResponseCategory
+    func (r ResponseCategory) String() string {
+        if v, ok := reverseResponseCategory[r]; ok {
+            return v
+        }
+        
+        return fmt.Sprintf("ResponseCategory(%+v)", r)
+    }
+
+    var ErrNoDescription = errors.New("no description for ADPU ResponseCategory")
+
+    //Info() returns a description of this Instruction. If no description is present, an error is returned.
+    func (r ResponseCategory) Info() (info string, err error) {
+        if v, ok := instructionInfo[r]; ok {
+            return v, nil
+        }
+
+        return "", ErrNoDescription
+    }
+{{- end -}}

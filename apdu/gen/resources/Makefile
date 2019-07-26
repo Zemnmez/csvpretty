@@ -4,4 +4,4 @@ $(BASE)%.csv: .FORCE
 
 .FORCE:
 .PHONY: all .FORCE
-all: $(wildcard ${BASE}*.csv)
+all: $(wildcard $(BASE)*.csv)
