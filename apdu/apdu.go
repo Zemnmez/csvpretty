@@ -2,6 +2,7 @@ package apdu
 
 import (
 	"encoding/binary"
+	"fmt"
 )
 
 var endianness = binary.BigEndian
@@ -17,4 +18,34 @@ type Apdu struct {
 	P2          byte
 	Data        []byte
 	Expected    byte
+}
+
+type Instruction byte
+
+func (i Instruction) String() string {
+	if v, ok := instrStringMap[i]; ok {
+		return v
+	}
+
+	return fmt.Sprintf("Instruction(%d)", int(i))
+}
+
+func (i Instrution) Info() string {
+	if v, ok := instrInfoMap[i]; ok {
+		return v
+	}
+
+	return fmt.Sprintf("no info!", int(i))
+}
+
+func (i Instruction) IsAlias() (isAlias bool) {
+	_, isAlias = instrSecondariesMap[i]
+	return
+}
+
+func (i Instruction) Resolve() Instruction {
+	if v, ok := instrSecondariesMap[i]; ok {
+		return v
+	}
+	return i
 }
