@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/zemnmez/cardauth/apdu/gen/lib"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -12,9 +13,9 @@ import (
 
 var (
 	cfgFile    string
-	idempotent bool
-	inputData  string
-	outputFile string
+	inputCSV  gen.CSVFile
+	inputGo gen.GoFile
+	outputFile gen.OutFile
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -40,12 +41,17 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gen.yaml)")
-	rootCmd.PersistentFlags().BoolVar(&idempotent, "x", false, "Print files instead of overwriting")
-	rootCmd.MarkFlagRequired("x")
-	rootCmd.PersistentFlags().StringVar(&inputData, "data", "", "Input data")
-	rootCmd.MarkFlagRequired("data")
-	rootCmd.PersistentFlags().StringVar(&outputFile, "out", "", "output file (must be an existing valid go file)")
-	rootCmd.MarkFlagRequired("out")
+
+
+
+	rootCmd.PersistentFlags().Var(&inputGo, "go", "Input go file")
+
+	rootCmd.PersistentFlags().Var(&inputCSV, "data", "input csv file")
+
+	rootCmd.PersistentFlags().Var(&outputFile, "out", "output file (must be an existing valid go file)")
+	rootCmd.MarkPersistentFlagRequired("go")
+	rootCmd.MarkPersistentFlagRequired("data")
+	rootCmd.MarkPersistentFlagRequired("out")
 }
 
 // initConfig reads in config file and ENV variables if set.

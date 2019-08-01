@@ -16,7 +16,7 @@ Code,             Short,                            Meaning
 0x6500,           unknown,                          No information given
 0x6581,           memory failure,                   Memory failure
 0x6800,           unknown,                          No information given
-0x6881',          unsupported channel,              Logical channel not supported
+0x6881,          unsupported channel,              Logical channel not supported
 0x6882,           secure unsupported,               Secure messaging not supported
 0x6883,           expected final command,           Last command of the chain expected
 0x6884,           chaining unsupported,             Command chaining not supported

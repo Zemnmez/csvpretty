@@ -5,8 +5,6 @@ import (
 	"go/token"
 	"io"
 	"bytes"
-	"os"
-
 	gen "github.com/zemnmez/cardauth/apdu/gen/lib"
 
 	"github.com/dave/dst"
@@ -16,42 +14,19 @@ import (
 
 // instructionsCmd represents the instructions command
 var instructionsCmd = &cobra.Command{
-	Use:   "instructions",
-	Short: "Generates definitions for APDU instructions",
+	Use:   "constants",
+	Short: "Generates constants and associated metadata from a csv",
 	RunE:  instructions,
 }
 
 func instructions(cmd *cobra.Command, args []string) (err error) {
-	var records [][]string
-	if records, err = gen.ReadCSV(inputData); err != nil {
-		return
-	}
-
 	// remove header
-	records = records[1:]
-
-	var f *dst.File
-	if f, err = gen.Load(outputFile); err != nil {
-		return
-	}
+	records := inputCSV.Records[1:]
 
 	var tmp bytes.Buffer
 
-	var out io.Writer = os.Stdout
-
-	if !idempotent {
-		var f *os.File
-		if f, err = os.OpenFile(outputFile, os.O_TRUNC|os.O_WRONLY, 0700); err != nil {
-			return
-		}
-
-		defer f.Close()
-
-		out = f
-	}
-
-
-	if f, err = makeInstructions(f, records); err != nil {
+	var f *dst.File
+	if f, err = makeInstructions(inputGo.File, records); err != nil {
 		return
 	}
 
@@ -59,9 +34,15 @@ func instructions(cmd *cobra.Command, args []string) (err error) {
 		return
 	}
 
-	if _, err = io.Copy(out, &tmp); err != nil { return }
+	if _, err = io.Copy(outputFile, &tmp); err != nil { return }
 
 	return
+}
+
+type infoMetadata struct {
+	OriginalName string
+	Identifier string
+	Info string
 }
 
 func makeInstructions(f *dst.File, records [][]string) (out *dst.File, err error) {
@@ -73,38 +54,46 @@ func makeInstructions(f *dst.File, records [][]string) (out *dst.File, err error
 
 	var infoMap = dst.CompositeLit{
 		Type: &dst.MapType{
-			Key:   dst.NewIdent(instrTypeName),
+			Key:   dst.NewIdent(typeName),
 			Value: dst.NewIdent("string"),
 		},
 	}
 
 	var stringifyMap = dst.CompositeLit{
 		Type: &dst.MapType{
-			Key:   dst.NewIdent(instrTypeName),
+			Key:   dst.NewIdent(typeName),
 			Value: dst.NewIdent("string"),
 		},
 	}
 
 	var aliasesMap = dst.CompositeLit{
 		Type: &dst.MapType{
-			Key:   dst.NewIdent(instrTypeName),
-			Value: dst.NewIdent(instrTypeName),
+			Key:   dst.NewIdent(typeName),
+			Value: dst.NewIdent(typeName),
 		},
 	}
 
 	for _, record := range records {
-		bytes, name, reference := record[0], record[1], record[2]
+		byteSq, name, reference := record[0], record[1], record[2]
 
 		var ns []gen.Number
-		if ns, err = gen.ParseValues(bytes); err != nil {
+		if ns, err = gen.ParseValues(byteSq); err != nil {
 			return
 		}
 
 		for i, n := range ns {
 			var spec dst.ValueSpec
-			myIdent := instrPrefixString + gen.MakeName(name)
-			fullRef := fmt.Sprintf("ISO/IEC 7816-4:2005(E) %s", reference)
-			myComment := fmt.Sprintf("// '%s': see %s", name, fullRef)
+			myIdent := prefixString + gen.MakeName(name)
+			var info bytes.Buffer
+
+			if err = commentTemplate.Execute(&info, infoMetadata {
+				OriginalName: name,
+				Identifier: myIdent,
+				Info: reference,
+			}); err != nil { return }
+
+			myComment := fmt.Sprintf("// %s", info.String())
+
 			var myValue dst.Expr = &dst.BasicLit{Kind: token.INT, Value: n.String()}
 			var isAlias = i > 0
 
@@ -122,14 +111,14 @@ func makeInstructions(f *dst.File, records [][]string) (out *dst.File, err error
 
 			}
 
-			spec.Type = dst.NewIdent(instrTypeName)
+			spec.Type = dst.NewIdent(typeName)
 			spec.Names = []*dst.Ident{dst.NewIdent(myIdent)}
 			spec.Values = []dst.Expr{myValue}
 			spec.Decorations().End.Append(myComment)
 
 			infoMap.Elts = append(infoMap.Elts, &dst.KeyValueExpr{
 				Key:   dst.NewIdent(myIdent),
-				Value: &dst.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("%+q", fmt.Sprintf("'%s': see %s", name, fullRef))},
+				Value: &dst.BasicLit{Kind: token.STRING, Value: fmt.Sprintf("%+q", info.String())},
 			})
 
 			stringifyMap.Elts = append(stringifyMap.Elts, &dst.KeyValueExpr{
@@ -158,22 +147,22 @@ func makeInstructions(f *dst.File, records [][]string) (out *dst.File, err error
 			Tok: token.VAR,
 			Specs: []dst.Spec{
 				&dst.ValueSpec{
-					Names:  []*dst.Ident{dst.NewIdent(instrInfoMapName)},
+					Names:  []*dst.Ident{dst.NewIdent(infoMapName)},
 					Values: []dst.Expr{&infoMap},
 				},
 
 				&dst.ValueSpec{
-					Names:  []*dst.Ident{dst.NewIdent(instrReverseStringMapName)},
+					Names:  []*dst.Ident{dst.NewIdent(reverseStringMapName)},
 					Values: []dst.Expr{&reversedStringify},
 				},
 
 				&dst.ValueSpec{
-					Names:  []*dst.Ident{dst.NewIdent(instrStringMapName)},
+					Names:  []*dst.Ident{dst.NewIdent(stringMapName)},
 					Values: []dst.Expr{&stringifyMap},
 				},
 
 				&dst.ValueSpec{
-					Names:  []*dst.Ident{dst.NewIdent(instrSecondariesMapName)},
+					Names:  []*dst.Ident{dst.NewIdent(secondariesMapName)},
 					Values: []dst.Expr{&aliasesMap},
 				},
 			},
@@ -184,29 +173,39 @@ func makeInstructions(f *dst.File, records [][]string) (out *dst.File, err error
 }
 
 var (
-	instrTypeName,
-	instrStringMapName,
-	instrInfoMapName,
-	instrPrefixString,
-	instrSecondariesMapName,
-	instrReverseStringMapName string
+	typeName,
+	stringMapName,
+	infoMapName,
+	prefixString,
+	secondariesMapName,
+	reverseStringMapName string
+
+	commentTemplate gen.Template
 )
+
 
 func init() {
 	rootCmd.AddCommand(instructionsCmd)
 
-	// Here you will define your flags and configuration settings.
+	instructionsCmd.Flags().Var(&commentTemplate, "comment", "template for generating the comment; see infoMetadata for available values")
+	instructionsCmd.MarkFlagRequired("comment")
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// instructionsCmd.PersistentFlags().String("foo", "", "A help for foo")
+	instructionsCmd.Flags().StringVar(&stringMapName, "stringMap", "", "name of mapping from instruction to string")
+	instructionsCmd.MarkFlagRequired("stringMap")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	instructionsCmd.Flags().StringVar(&instrStringMapName, "stringMap", "instrStringMap", "name of mapping from instruction to string")
-	instructionsCmd.Flags().StringVar(&instrInfoMapName, "infoMap", "instrInfoMap", "name of mapping from instruction to info")
-	instructionsCmd.Flags().StringVar(&instrReverseStringMapName, "reverseStringMap", "reverseInstrStringMap", "name of mapping from string to instruction")
-	instructionsCmd.Flags().StringVar(&instrPrefixString, "prefix", "Instruction", "prefix added to generated consts")
-	instructionsCmd.Flags().StringVar(&instrTypeName, "type", "Instruction", "the type name of an instruction")
-	instructionsCmd.Flags().StringVar(&instrSecondariesMapName, "secondariesMap", "instrSecondaries", "the name of the generated mapping from secondaries to primary values for ranges")
+	instructionsCmd.Flags().StringVar(&infoMapName, "infoMap", "", "name of mapping from instruction to info")
+	instructionsCmd.MarkFlagRequired("infoMap")
+
+	instructionsCmd.Flags().StringVar(&reverseStringMapName, "reverseStringMap", "", "name of mapping from string to instruction")
+	instructionsCmd.MarkFlagRequired("reverseStringMap")
+
+	instructionsCmd.Flags().StringVar(&prefixString, "prefix", "", "prefix added to generated consts")
+	instructionsCmd.MarkFlagRequired("prefix")
+
+	instructionsCmd.Flags().StringVar(&typeName, "type", "", "the type name of an instruction")
+	instructionsCmd.MarkFlagRequired("type")
+
+	instructionsCmd.Flags().StringVar(&secondariesMapName, "secondariesMap", "", "the name of the generated mapping from secondaries to primary values for ranges")
+	instructionsCmd.MarkFlagRequired("secondariesMapName")
+
 }

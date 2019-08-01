@@ -2,69 +2,22 @@
 package gen
 
 import (
-	"bytes"
 	"encoding/csv"
+	"text/template"
+	"io"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"bytes"
 	"reflect"
 	"strconv"
 	"strings"
 	"unicode"
+	"os"
 
 	"github.com/dave/dst"
 	decorator "github.com/dave/dst/decorator"
 )
-
-// Load loads a file for overwriting. All entities not annotated
-// with a go:generate comment are stripped
-func Load(name string) (f *dst.File, err error) {
-	var inFile []byte
-	if inFile, err = ioutil.ReadFile(name); err != nil {
-		return
-	}
-
-	if f, err = decorator.Parse(inFile); err != nil {
-		return
-	}
-
-	var newDecls []dst.Decl
-	for _, Decl := range f.Decls {
-		comments := Decl.Decorations().Start.All()
-		if len(comments) < 1 {
-			continue
-		}
-
-		if !strings.Contains(comments[0], "//go:generate") {
-			continue
-		}
-
-		newDecls = append(newDecls, Decl)
-	}
-
-	f.Decls = newDecls
-
-	return
-}
-
-// ReadCSV reads a CSV file by name, trimming any leading space from
-// records.
-func ReadCSV(name string) (records [][]string, err error) {
-
-	var csvFile []byte
-	if csvFile, err = ioutil.ReadFile(name); err != nil {
-		return
-	}
-
-	csvReader := csv.NewReader(bytes.NewReader(csvFile))
-	csvReader.TrimLeadingSpace = true
-	if records, err = csvReader.ReadAll(); err != nil {
-		return
-	}
-
-	return
-
-}
 
 // ReverseMapLit returns a dst.CompositeLit which is the exact reverse of its
 // input.
@@ -215,10 +168,165 @@ func ParseRange(r string) (ns []Number, err error) {
 		err = fmt.Errorf("range invalid: %s should be before %s", low, high)
 	}
 
-	ns = make([]Number, high.Int()-low.Int())
+	ns = make([]Number, high.Int()-low.Int() +1)
 	for i := 0; (i + low.Int()) <= high.Int(); i++ {
 		ns[i] = low.Add(i)
 	}
 
+	return
+}
+
+// InFile represents an input file, or `-` for stdin
+type InFile struct {
+	Content []byte
+	Path string
+}
+
+// Type implements pflag.Value
+func (InFile) Type() string { return "file" }
+
+// String implements flag.Value
+func (i InFile) String() string { return i.Path }
+
+// Set implements flag.Value
+func (i *InFile) Set(path string) (err error) {
+	i.Path = path
+	var r io.ReadCloser
+	switch {
+	case path == "-":
+		r = ioutil.NopCloser(os.Stdin)
+	default:
+
+	if r, err = os.OpenFile(path, os.O_RDONLY, 0700); err != nil {
+		return
+	}
+	}
+
+	defer r.Close()
+
+	if i.Content, err = ioutil.ReadAll(r); err != nil { return }
+
+	return
+}
+
+type nopWriteCloser struct {
+	io.Writer
+}
+
+func (n nopWriteCloser) Close() error { return nil }
+
+// OutFile represents a file one can write to, or stdout ("-")
+type OutFile struct {
+	io.WriteCloser
+	Path string
+}
+
+// Type implements pflag.Value
+func (OutFile) Type() string { return "file" }
+
+
+// String implements flag.Value
+func (i OutFile) String() string { return i.Path }
+
+// Set implements flag.Value
+func (i *OutFile) Set(path string) (err error) {
+	i.Path = path
+	if path == "-" {
+		i.WriteCloser = nopWriteCloser{ os.Stdout }
+		return
+	}
+
+	if i.WriteCloser, err = os.OpenFile(path, os.O_TRUNC|os.O_WRONLY, 0700); err != nil {
+		return
+	}
+
+	return
+}
+
+// CSVFile represents the records loaded from an on disk CSV file or stdin ("-")
+type CSVFile struct {
+	InFile
+	Records [][]string
+}
+
+
+// Type implements pflag.Value
+func (CSVFile) Type() string { return "*.csv" }
+
+// String implements flag.Value
+func (c CSVFile) String() string { return c.Path }
+
+// Set implements flag.Value
+func (c *CSVFile) Set(value string) (err error) {
+	if err = c.InFile.Set(value); err != nil { return }
+
+	csvReader := csv.NewReader(bytes.NewReader(c.InFile.Content))
+	csvReader.TrimLeadingSpace = true
+
+	if c.Records, err = csvReader.ReadAll(); err != nil {
+		return
+	}
+
+	return
+}
+
+// GoFile represents the AST loaded from an on-disk .go file or stdin ("-")
+type GoFile struct {
+	InFile
+	*dst.File
+}
+
+// Type implements pflag.Value
+func (GoFile) Type() string { return "*.go" }
+
+// String implements flag.Value
+func (g GoFile) String() string { return g.Path }
+
+// Set implements flag.Value
+func (g *GoFile) Set(value string) (err error) {
+	if err = g.InFile.Set(value); err != nil {
+		return
+	}
+	
+	if g.File, err = decorator.Parse(g.Content); err != nil {
+		return
+	}
+
+	var newDecls []dst.Decl
+	for _, Decl := range g.File.Decls {
+		comments := Decl.Decorations().Start.All()
+		if len(comments) < 1 {
+			continue
+		}
+
+		if !strings.Contains(comments[0], "//go:generate") {
+			continue
+		}
+
+		newDecls = append(newDecls, Decl)
+	}
+
+	g.File.Decls = newDecls
+
+	return
+
+}
+
+
+// Template is a *template.Template implementing flag.Value
+type Template struct {
+	Raw string
+	*template.Template
+}
+
+// Type implements pflag.Value
+func (t Template) Type() string { return "TemplateString" }
+
+// String implements flag.Value
+func (t Template) String() string { return t.Raw }
+
+// Set implements flag.Value
+func (t *Template) Set(tmp string) (err error) {
+	if t.Template, err = template.New("").Parse(tmp); err != nil { return }
 	return
 }
