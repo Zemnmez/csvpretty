@@ -1,3 +1,6 @@
+
+//+build none
+
 package apdu
 
 //go:generate go run golang.org/x/tools/cmd/stringer -type=Status,StatusCategory

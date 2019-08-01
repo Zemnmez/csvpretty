@@ -122,6 +122,14 @@ func do() (err error) {
 		return
 	}
 
+	// trim extra space around each line
+	var trimmed bytes.Buffer
+	for _, line := range bytes.Split(buf.Bytes(), []byte("\n")) {
+		if _, err = trimmed.Write(append(bytes.TrimSpace(line), []byte("\n")...)); err != nil {
+			return
+		}
+	}
+
 	var outfile io.Writer = os.Stdout
 
 	if output != "" && output != "-" {
@@ -134,7 +142,7 @@ func do() (err error) {
 		outfile = f
 	}
 
-	if _, err = io.Copy(outfile, &buf); err != nil {
+	if _, err = io.Copy(outfile, &trimmed); err != nil {
 		return
 	}
 

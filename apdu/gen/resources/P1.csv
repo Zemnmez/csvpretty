@@ -1,16 +1,17 @@
-Code,   Category,             Meaning                                                                                
-0x61,   Normal Processing,    SW2 encodes the number of data bytes still available                                    
-0x62,   Warning Processing,   State of non-volatile memory is unchanged                                               
-0x63,   Warning Processing,   State of non-volatile memory has changed                                                
-0x64,   Execution Error,      State of non-volatile memory is unchanged                                               
-0x65,   Execution Error,      State of non-volatile memory has changed                                                
-0x66,   Execution Error,      Security-related issues                                                                 
-0x67,   Checking Error,       Wrong length; no further indication                                                     
-0x68,   Checking Error,       Functions in CLA not supported Functions in CLA not supported                           
-0x69,   Checking Error,       Command not allowed                                                                     
-0x6A,   Checking Error,       Wrong parameters P1-P2                                                                  
-0x6B,   Checking Error,       Wrong parameters P1-P2                                                                  
-0x6C,   Checking Error,       Wrong Le field; SW2 encodes the exact number of available data bytes (see text below)   
-0x6D,   Checking Error,       Instruction code not supported or invalid                                               
-0x6E,   Checking Error,       Class not supported                                                                     
-0x6F,   Checking Error,       No precise diagnosis                                                                    
+Code,   Category,             Meaning
+0x61,   Normal Processing,    SW2 encodes the number of data bytes still available
+0x62,   Warning Processing,   State of non-volatile memory is unchanged
+0x63,   Warning Processing,   State of non-volatile memory has changed
+0x64,   Execution Error,      State of non-volatile memory is unchanged
+0x65,   Execution Error,      State of non-volatile memory has changed
+0x66,   Execution Error,      Security-related issues
+0x67,   Checking Error,       Wrong length; no further indication
+0x68,   Checking Error,       Functions in CLA not supported Functions in CLA not supported
+0x69,   Checking Error,       Command not allowed
+0x6A,   Checking Error,       Wrong parameters P1-P2
+0x6B,   Checking Error,       Wrong parameters P1-P2
+0x6C,   Checking Error,       Wrong Le field; SW2 encodes the exact number of available data bytes (see text below)
+0x6D,   Checking Error,       Instruction code not supported or invalid
+0x6E,   Checking Error,       Class not supported
+0x6F,   Checking Error,       No precise diagnosis
+

@@ -14,7 +14,7 @@ sum.Makefile: $(addsuffix .include,$(shell ls ./*/**/Makefile))
 .PHONY: dummy
 
 dummy: sum.Makefile
-	STEP=DO $(MAKE) -j -f $< $(MAKECMDGOALS)
+	STEP=DO $(MAKE) -$(MAKEFLAGS) -j -f $< $(MAKECMDGOALS)
 
 %: dummy
 	-

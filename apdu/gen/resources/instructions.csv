@@ -1,40 +1,41 @@
-Bytes,        Name,                               Reference   
-0x04,         DEACTIVATE FILE,                    Part 9      
-0x0C,         ERASE RECORD,                   7.3.8       
-0x0E; 0x0F,   ERASE BINARY,                       7.2.7       
-0x10,         PERFORM SCQL OPERATION,             Part 7      
-0x12,         PERFORM TRANSACTION OPERATION,      Part 7      
-0x14,         PERFORM USER OPERATION,             Part 7      
-0x20; 0x21,   VERIFY,                             7.5.6       
-0x22,         MANAGE SECURITY ENVIRONMENT,        7.5.11      
-0x24,         CHANGE REFERENCE DATA,              7.5.7       
-0x26,         DISABLE VERIFICATION REQUIREMENT,   7.5.9       
-0x28,         ENABLE VERIFICATION REQUIREMENT,    7.5.8       
-0x2A,         PERFORM SECURITY OPERATION,         Part 8      
-0x2C,         RESET RETRY COUNTER,                7.5.10      
-0x44,         ACTIVATE FILE,                      Part 9      
-0x46,         GENERATE ASYMMETRIC KEY PAIR,       Part 8      
-0x70,         MANAGE CHANNEL,                     7.1.2       
-0x82,         EXTERNAL (/ MUTUAL) AUTHENTICATE,   7.5.4       
-0x84,         GET CHALLENGE,                      7.5.3       
-0x86; 0x87,   GENERAL AUTHENTICATE,               7.5.5       
-0x88,         INTERNAL AUTHENTICATE,              7.5.2       
-0xA0; 0xA1,   SEARCH BINARY,                      7.2.6       
-0xA2,         SEARCH RECORD,                      7.3.7       
-0xA4,         SELECT,                             7.1.1       
-0xB0; 0xB1,   READ BINARY,                        7.2.3       
-0xB2; 0xB3,   READ RECORD,                        (S) 7.3.3   
-0xC0,         GET RESPONSE,                       7.6.1       
-0xC2; 0xC3,   ENVELOPE,                           7.6.2       
-0xCA; 0xCB,   GET DATA,                           7.4.2       
-0xD0; 0xD1,   WRITE BINARY,                       7.2.6       
-0xD2,         WRITE RECORD,                       7.3.4       
-0xD6; 0xD7,   UPDATE BINARY,                      7.2.5       
-0xDA; 0xDB,   PUT DATA,                           7.4.3       
-0xDC; 0xDD,   UPDATE RECORD,                      7.3.5       
-0xE0,         CREATE FILE,                        Part 9      
-0xE2,         APPEND RECORD,                      7.3.6       
-0xE4,         DELETE FILE,                        Part 9      
-0xE6,         TERMINATE DF,                       Part 9      
-0xE8,         TERMINATE EF,                       Part 9      
-0xFE,         TERMINATE CARD USAGE,               Part 9      
+Bytes,        Name,                               Reference
+0x04,         DEACTIVATE FILE,                    Part 9
+0x0C,         ERASE RECORD,                       7.3.8
+0x0E; 0x0F,   ERASE BINARY,                       7.2.7
+0x10,         PERFORM SCQL OPERATION,             Part 7
+0x12,         PERFORM TRANSACTION OPERATION,      Part 7
+0x14,         PERFORM USER OPERATION,             Part 7
+0x20; 0x21,   VERIFY,                             7.5.6
+0x22,         MANAGE SECURITY ENVIRONMENT,        7.5.11
+0x24,         CHANGE REFERENCE DATA,              7.5.7
+0x26,         DISABLE VERIFICATION REQUIREMENT,   7.5.9
+0x28,         ENABLE VERIFICATION REQUIREMENT,    7.5.8
+0x2A,         PERFORM SECURITY OPERATION,         Part 8
+0x2C,         RESET RETRY COUNTER,                7.5.10
+0x44,         ACTIVATE FILE,                      Part 9
+0x46,         GENERATE ASYMMETRIC KEY PAIR,       Part 8
+0x70,         MANAGE CHANNEL,                     7.1.2
+0x82,         EXTERNAL (/ MUTUAL) AUTHENTICATE,   7.5.4
+0x84,         GET CHALLENGE,                      7.5.3
+0x86; 0x87,   GENERAL AUTHENTICATE,               7.5.5
+0x88,         INTERNAL AUTHENTICATE,              7.5.2
+0xA0; 0xA1,   SEARCH BINARY,                      7.2.6
+0xA2,         SEARCH RECORD,                      7.3.7
+0xA4,         SELECT,                             7.1.1
+0xB0; 0xB1,   READ BINARY,                        7.2.3
+0xB2; 0xB3,   READ RECORD,                        (S) 7.3.3
+0xC0,         GET RESPONSE,                       7.6.1
+0xC2; 0xC3,   ENVELOPE,                           7.6.2
+0xCA; 0xCB,   GET DATA,                           7.4.2
+0xD0; 0xD1,   WRITE BINARY,                       7.2.6
+0xD2,         WRITE RECORD,                       7.3.4
+0xD6; 0xD7,   UPDATE BINARY,                      7.2.5
+0xDA; 0xDB,   PUT DATA,                           7.4.3
+0xDC; 0xDD,   UPDATE RECORD,                      7.3.5
+0xE0,         CREATE FILE,                        Part 9
+0xE2,         APPEND RECORD,                      7.3.6
+0xE4,         DELETE FILE,                        Part 9
+0xE6,         TERMINATE DF,                       Part 9
+0xE8,         TERMINATE EF,                       Part 9
+0xFE,         TERMINATE CARD USAGE,               Part 9
+

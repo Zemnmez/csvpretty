@@ -26,45 +26,45 @@ func _() {
 }
 
 const (
-	_Error_Status_name_0 = "Warning: state of non-volatile memory has not changed: No reason given"
-	_Error_Status_name_1 = "Warning: state of non-volatile memory has not changed: Part of returned data may be corruptedWarning: state of non-volatile memory has not changed: End of file or record reached before reading Ne bytesWarning: state of non-volatile memory has not changed: Selected file deactivatedWarning: state of non-volatile memory has not changed: File control information not formatted correctlyWarning: state of non-volatile memory has changed: Selected file in termination stateWarning: state of non-volatile memory has not changed: No input data available from a sensor on the card"
-	_Error_Status_name_2 = "Warning: state of non-volatile memory has changed: No reason given"
-	_Error_Status_name_3 = "Warning: state of non-volatile memory has changed: File filled up by the last write"
-	_Error_Status_name_4 = "Error: \"wrong length; no further indication\""
-	_Error_Status_name_5 = "Error: \"Wrong parameters P1-P2\""
-	_Error_Status_name_6 = "Error: \"Instruction code not supported or invalid\""
-	_Error_Status_name_7 = "Error: \"Class not supported\""
-	_Error_Status_name_8 = "Error: \"No precise diagnosis\""
-	_Error_Status_name_9 = "No further qualification"
+	_Status_name_0 = "Warning: state of non-volatile memory has not changed: No reason given"
+	_Status_name_1 = "Warning: state of non-volatile memory has not changed: Part of returned data may be corruptedWarning: state of non-volatile memory has not changed: End of file or record reached before reading Ne bytesWarning: state of non-volatile memory has not changed: Selected file deactivatedWarning: state of non-volatile memory has not changed: File control information not formatted correctlyWarning: state of non-volatile memory has changed: Selected file in termination stateWarning: state of non-volatile memory has not changed: No input data available from a sensor on the card"
+	_Status_name_2 = "Warning: state of non-volatile memory has changed: No reason given"
+	_Status_name_3 = "Warning: state of non-volatile memory has changed: File filled up by the last write"
+	_Status_name_4 = "Error: \"wrong length; no further indication\""
+	_Status_name_5 = "Error: \"Wrong parameters P1-P2\""
+	_Status_name_6 = "Error: \"Instruction code not supported or invalid\""
+	_Status_name_7 = "Error: \"Class not supported\""
+	_Status_name_8 = "Error: \"No precise diagnosis\""
+	_Status_name_9 = "No further qualification"
 )
 
 var (
-	_Error_Status_index_1 = [...]uint16{0, 93, 201, 281, 384, 469, 573}
+	_Status_index_1 = [...]uint16{0, 93, 201, 281, 384, 469, 573}
 )
 
 func (i Status) Error() string {
 	switch {
 	case i == 25090:
-		return _Error_Status_name_0
+		return _Status_name_0
 	case 25217 <= i && i <= 25222:
 		i -= 25217
-		return _Error_Status_name_1[_Error_Status_index_1[i]:_Error_Status_index_1[i+1]]
+		return _Status_name_1[_Status_index_1[i]:_Status_index_1[i+1]]
 	case i == 25344:
-		return _Error_Status_name_2
+		return _Status_name_2
 	case i == 25473:
-		return _Error_Status_name_3
+		return _Status_name_3
 	case i == 26368:
-		return _Error_Status_name_4
+		return _Status_name_4
 	case i == 27392:
-		return _Error_Status_name_5
+		return _Status_name_5
 	case i == 27904:
-		return _Error_Status_name_6
+		return _Status_name_6
 	case i == 28160:
-		return _Error_Status_name_7
+		return _Status_name_7
 	case i == 28416:
-		return _Error_Status_name_8
+		return _Status_name_8
 	case i == 36864:
-		return _Error_Status_name_9
+		return _Status_name_9
 	default:
 		return "Status(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
@@ -86,26 +86,26 @@ func _() {
 }
 
 const (
-	_Error_StatusCategory_name_0 = "SW2 encodes the number of data bytes still availableWarning: state of non-volatile memory is unchanged (further qualification in SW2)Warning: state of non-volatile memory has changed (further qualifications in SW2)Error: state of non-volatile memory is unchanged (further qualification in SW2)Error: state of non-volatile memory has changed (further qualifications in SW2)Error: \"security related issues\""
-	_Error_StatusCategory_name_1 = "Error: \"Functions in CLA not supported (further qualification in SW2)\"Error: \"Command not allowed (further qualification in SW2)\"Error: \"Wrong parameters P1-P2 (further qualification in SW2)\""
-	_Error_StatusCategory_name_2 = "Error: \"Wrong Le field: SW2 encodes the exact number of available data bytes\""
+	_StatusCategory_name_0 = "SW2 encodes the number of data bytes still availableWarning: state of non-volatile memory is unchanged (further qualification in SW2)Warning: state of non-volatile memory has changed (further qualifications in SW2)Error: state of non-volatile memory is unchanged (further qualification in SW2)Error: state of non-volatile memory has changed (further qualifications in SW2)Error: \"security related issues\""
+	_StatusCategory_name_1 = "Error: \"Functions in CLA not supported (further qualification in SW2)\"Error: \"Command not allowed (further qualification in SW2)\"Error: \"Wrong parameters P1-P2 (further qualification in SW2)\""
+	_StatusCategory_name_2 = "Error: \"Wrong Le field: SW2 encodes the exact number of available data bytes\""
 )
 
 var (
-	_Error_StatusCategory_index_0 = [...]uint16{0, 52, 133, 214, 293, 372, 404}
-	_Error_StatusCategory_index_1 = [...]uint8{0, 70, 129, 191}
+	_StatusCategory_index_0 = [...]uint16{0, 52, 133, 214, 293, 372, 404}
+	_StatusCategory_index_1 = [...]uint8{0, 70, 129, 191}
 )
 
 func (i StatusCategory) Error() string {
 	switch {
 	case 97 <= i && i <= 102:
 		i -= 97
-		return _Error_StatusCategory_name_0[_Error_StatusCategory_index_0[i]:_Error_StatusCategory_index_0[i+1]]
+		return _StatusCategory_name_0[_StatusCategory_index_0[i]:_StatusCategory_index_0[i+1]]
 	case 104 <= i && i <= 106:
 		i -= 104
-		return _Error_StatusCategory_name_1[_Error_StatusCategory_index_1[i]:_Error_StatusCategory_index_1[i+1]]
+		return _StatusCategory_name_1[_StatusCategory_index_1[i]:_StatusCategory_index_1[i+1]]
 	case i == 108:
-		return _Error_StatusCategory_name_2
+		return _StatusCategory_name_2
 	default:
 		return "StatusCategory(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
