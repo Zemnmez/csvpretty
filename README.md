@@ -33,7 +33,7 @@ Dog, C. l. familiaris, C. lupus, Canis
 
 
 
-CSVPretty produces:
+`csvpretty -input test.csv -output test_out.csv` produces:
 
 [test_out.csv                                                  ](test_out.csv)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~          csv
@@ -43,6 +43,16 @@ Meerkat,                ,                   s.Suricata
 Dog,                    C. l. familiaris,   C. lupus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
+Installation
+-----------------------------------------------------------------------------
+[Installation]: #Installation
+
+With a working Go setup, and `$GOPATH/bin` in your `$PATH`:
+```bash
+go get github.com/zemnmez/csvpretty -u
+```
 
 
 Limitations
