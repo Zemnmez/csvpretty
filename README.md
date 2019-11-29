@@ -54,6 +54,28 @@ With a working Go setup, and `$GOPATH/bin` in your `$PATH`:
 go get github.com/zemnmez/csvpretty -u
 ```
 
+If you want to quickly use `csvpretty` and you have `go` installed, you can
+just:
+
+```bash
+go run github.com/zemnmez/csvpretty
+```
+
+With whatever args you desire.
+
+
+Usage With `go generate`
+-----------------------------------------------------------------------------
+You can use `csvpretty` in conjunction with `go generate` to automatically
+pretty print CSVs. This is best used in conjection with `go mod`, which will
+manage your tooling versions automagically.
+
+To do this, add a `go generate` line to a `.go` file like this:
+
+```go
+//go:generate go run github.com/zemnmez/csvpretty -input myfile.csv -w
+```
+
 
 Limitations
 -----------------------------------------------------------------------------
@@ -94,7 +116,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-(See [LICENSE])
-
-[LICENSE]: LICENSE

@@ -1,3 +1,3 @@
-module github.com/zemnmez/cardauth
+module github.com/zemnmez/csvpretty
 
 go 1.12
